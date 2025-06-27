@@ -81,7 +81,7 @@
     <div class="error" id="error-message"></div>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
-    <button onclick="loginToBothApps()">Login</button>
+    <button id="loginBtn" onclick="loginToBothApps()">Login</button>
 </div>
 <script>
     const token = localStorage.getItem('foodpanda_token');
@@ -96,6 +96,7 @@
         errorDiv.textContent = '';
 
         try {
+            document.getElementById('loginBtn').textContent = 'Loading...';
             const resA = await fetch('http://localhost:8000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -106,8 +107,8 @@
             if (!resA.ok) {
                 throw new Error(dataA.message || 'Ecommerce login failed');
             }
-
-            await storeEcommerceToken(dataA.token);
+            localStorage.setItem('ecommerce_token', dataA.token);
+            ;
 
             const resB = await fetch('http://localhost:8001/api/login', {
                 method: 'POST',
@@ -121,7 +122,8 @@
             }
 
             localStorage.setItem('foodpanda_token', dataB.token);
-
+            await storeEcommerceToken(dataA.token, dataB.token)
+            document.getElementById('loginBtn').textContent = 'Login';
             window.location.href = '/dashboard';
         } catch (err) {
             errorDiv.textContent = err.message;
@@ -138,13 +140,13 @@
             iframe.onload = () => {
                 iframe.contentWindow.postMessage(message, 'http://127.0.0.1:8000');
                 resolve();
-                setTimeout(() => document.body.removeChild(iframe), 100);
+                setTimeout(() => document.body.removeChild(iframe), 1000);
             };
         });
     }
 
-    async function storeEcommerceToken(token) {
-        await sendMessageToEcommerce({ action: 'store_token', token });
+    async function storeEcommerceToken(ecommerceToken,foodpandaToken) {
+        await sendMessageToEcommerce({ action: 'store_token', ecommerceToken, foodpandaToken });
     }
 </script>
 </body>
