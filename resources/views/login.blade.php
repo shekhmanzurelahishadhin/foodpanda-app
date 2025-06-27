@@ -12,54 +12,72 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
         }
 
-        .login-form {
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        .card {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            transition: all 0.3s ease;
         }
 
-        .login-form h2 {
+        .card h2 {
             text-align: center;
-            margin-bottom: 25px;
-            color: #333;
+            margin-bottom: 20px;
+            color: #0f766e;
+            font-size: 24px;
+            letter-spacing: 1px;
         }
 
-        .login-form input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+        .card input {
+            width: 93%;
+            padding: 14px;
+            margin: 12px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             font-size: 16px;
+            transition: border 0.3s;
         }
 
-        .login-form button {
+        .card input:focus {
+            border-color: #14b8a6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+        }
+
+        .card button {
             width: 100%;
-            padding: 12px;
-            background-color: #3498db;
+            padding: 14px;
+            background-color: #14b8a6;
             color: white;
             font-size: 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
             transition: background-color 0.3s ease;
         }
 
-        .login-form button:hover {
-            background-color: #2980b9;
+        .card button:hover {
+            background-color: #0f766e;
+        }
+
+        .error {
+            color: #ef4444;
+            margin-top: 5px;
+            font-size: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Ecommerce Login</h2>
+    <h2>Foodpanda Login</h2>
     <div class="error" id="error-message"></div>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
@@ -120,8 +138,7 @@
             iframe.onload = () => {
                 iframe.contentWindow.postMessage(message, 'http://127.0.0.1:8000');
                 resolve();
-                // Optionally remove iframe after a delay to avoid race conditions:
-                setTimeout(() => document.body.removeChild(iframe), 1000);
+                setTimeout(() => document.body.removeChild(iframe), 100);
             };
         });
     }

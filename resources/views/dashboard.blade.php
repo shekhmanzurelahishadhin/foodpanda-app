@@ -135,8 +135,7 @@
             iframe.onload = () => {
                 iframe.contentWindow.postMessage(message, 'http://127.0.0.1:8000');
                 resolve();
-                // Optionally remove iframe after a delay to avoid race conditions:
-                setTimeout(() => document.body.removeChild(iframe), 1000);
+                setTimeout(() => document.body.removeChild(iframe), 100);
             };
         });
     }
