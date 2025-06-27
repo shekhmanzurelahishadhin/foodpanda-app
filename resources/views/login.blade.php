@@ -58,13 +58,78 @@
 </head>
 <body>
 
-<form method="POST" action="/login" class="login-form">
-    @csrf
-    <h2>Login to Foodpanda</h2>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+<div class="card">
+    <h2>Ecommerce Login</h2>
+    <div class="error" id="error-message"></div>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="loginToBothApps()">Login</button>
+</div>
+<script>
+    const token = localStorage.getItem('foodpanda_token');
+    if (token) {
+        // Optionally verify token validity via API or just redirect
+        window.location.href = '/dashboard';
+    }
+    async function loginToBothApps() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = '';
 
+        try {
+            const resA = await fetch('http://localhost:8000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const dataA = await resA.json();
+            if (!resA.ok) {
+                throw new Error(dataA.message || 'Ecommerce login failed');
+            }
+
+            await storeEcommerceToken(dataA.token);
+
+            const resB = await fetch('http://localhost:8001/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const dataB = await resB.json();
+            if (!resB.ok) {
+                throw new Error(dataB.message || 'Ecommerce login failed');
+            }
+
+            localStorage.setItem('foodpanda_token', dataB.token);
+
+            window.location.href = '/dashboard';
+        } catch (err) {
+            errorDiv.textContent = err.message;
+        }
+    }
+
+    function sendMessageToEcommerce(message) {
+        return new Promise((resolve) => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'http://127.0.0.1:8000/token-handler';
+            document.body.appendChild(iframe);
+
+            iframe.onload = () => {
+                iframe.contentWindow.postMessage(message, 'http://127.0.0.1:8000');
+                resolve();
+                // Optionally remove iframe after a delay to avoid race conditions:
+                setTimeout(() => document.body.removeChild(iframe), 1000);
+            };
+        });
+    }
+
+    async function storeEcommerceToken(token) {
+        await sendMessageToEcommerce({ action: 'store_token', token });
+    }
+</script>
 </body>
 </html>
+
